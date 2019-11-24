@@ -79,6 +79,13 @@
                 </div>
             @endif
         </div>
+        <div class="mt-5">
+        	<div class="card">
+        		<div class="card-header p-5">
+        			<h1 class="text-muted text-center">Real-Time Chatting Testing <small><em>( Laravel & Vue )</em></small></h1>
+        		</div>
+        	</div>
+        </div>
         <script src="{{ asset('js/app.js') }}"></script>
     </body>
 </html>

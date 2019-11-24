@@ -4,7 +4,7 @@
            <div class="col-8">
                <div class="card">
                    <div class="car-body p-0">
-                       <ul class="list-unstyled" style="height : 300px; overflow-y : scroll">
+                       <ul class="list-unstyled" style="height : 300px; overflow-y : scroll" v-chat-scroll>
                            <li class="list-group-item" v-for="data in message_data" :key="data.id">
                               <strong>{{ data.user.name }} - </strong> {{ data.message }}
                            </li>
@@ -12,7 +12,8 @@
                    </div>
                </div>
                <div class="form-group">
-                   <input type="text" @keyup.enter="sendMessage" v-model="message" placeholder="Type something" class="form form-control">
+                   <input type="text" @keydown="sendTypingEvent" @keyup.enter="sendMessage" v-model="message" placeholder="Type something" class="form form-control">
+                   <span class="text-muted" v-if="active_user">{{ active_user.name }} is typing</span>
                </div>
            </div>
            <div class="col-4">
@@ -33,13 +34,16 @@
 
 <script>
     import axios from 'axios';
+import { timeout } from 'q';
     export default {
         props : [ 'user' ],
         data : function(){
             return {
                 message : '',
                 message_data : [],
-                users : []
+                users : [],
+                active_user : false,
+                typing_time_out : false
             }
         },
         methods : {
@@ -66,6 +70,10 @@
                 .catch(error => {
                     console.log(error.response);
                 })
+            },
+            sendTypingEvent : function(){
+                Echo.join('chat')
+                .whisper('typing', this.user);
             }
         },
         created() {
@@ -85,6 +93,15 @@
             })
             .listen('ChatEvent', (event) => {
                 this.message_data.push(event.message);
+            })
+            .listenForWhisper('typing', (response) => {
+                this.active_user = response;
+                if(this.typing_time_out){
+                    clearTimeout(this.typing_time_out);
+                }
+                this.typing_time_out=setTimeout(() => {
+                    this.active_user = false;
+                },3000)
             })
         }
     }
