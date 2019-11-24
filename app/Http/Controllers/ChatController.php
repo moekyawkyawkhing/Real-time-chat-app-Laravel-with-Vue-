@@ -28,7 +28,7 @@ class ChatController extends Controller
             'user_id' => Auth::user()->id,
             'message' => $request->get('message')
         ]);
-        broadcast(new ChatEvent($message));
+        broadcast(new ChatEvent($message->load('user')));
         return response()->json('success');
     }
 }

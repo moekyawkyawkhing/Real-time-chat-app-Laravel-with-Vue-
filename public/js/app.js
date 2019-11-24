@@ -1879,7 +1879,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       message: '',
-      message_data: []
+      message_data: [],
+      users: []
     };
   },
   methods: {
@@ -1900,7 +1901,6 @@ __webpack_require__.r(__webpack_exports__);
     fetchData: function fetchData() {
       var vm = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/chat_data').then(function (response) {
-        console.log(response.data);
         vm.message_data = [];
         vm.message_data = response.data;
       })["catch"](function (error) {
@@ -1913,12 +1913,18 @@ __webpack_require__.r(__webpack_exports__);
 
     this.fetchData();
     Echo.join('chat').here(function (user) {
-      console.log(user);
+      console.log("here");
+      _this2.users = user;
     }).joining(function (user) {
-      console.log(user);
-    }).listen('ChatEvent', function (event) {
-      console.log("listen event");
+      console.log("joining");
 
+      _this2.users.push(user);
+    }).leaving(function (user) {
+      console.log("leaving");
+      _this2.users = _this2.users.filter(function (u) {
+        return u.id != user.id;
+      });
+    }).listen('ChatEvent', function (event) {
       _this2.message_data.push(event.message);
     });
   }
@@ -47110,7 +47116,7 @@ var render = function() {
                   "li",
                   { key: data.id, staticClass: "list-group-item" },
                   [
-                    _c("strong", [_vm._v(_vm._s(_vm.user.name) + " - ")]),
+                    _c("strong", [_vm._v(_vm._s(data.user.name) + " - ")]),
                     _vm._v(
                       " " + _vm._s(data.message) + "\n                       "
                     )
@@ -47156,34 +47162,33 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _vm._m(0)
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-4" }, [
-      _c("div", { staticClass: "card" }, [
-        _c("div", { staticClass: "card-body" }, [
-          _c("strong", { staticClass: "car-header text-muted mb-2" }, [
-            _vm._v("Active User")
-          ]),
-          _vm._v(" "),
-          _c("ul", { staticClass: "list-unstyled" }, [
-            _c("li", { staticClass: "list-group-item" }, [
-              _vm._v(
-                "\n                           John\n                       "
-              )
-            ])
+      _c("div", { staticClass: "col-4" }, [
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-body" }, [
+            _c("strong", { staticClass: "car-header text-muted mb-2" }, [
+              _vm._v("Active User")
+            ]),
+            _vm._v(" "),
+            _c(
+              "ul",
+              _vm._l(_vm.users, function(user) {
+                return _c("li", { key: user.id, staticClass: "text-success" }, [
+                  _vm._v(
+                    "\n                           " +
+                      _vm._s(user.name) +
+                      "\n                       "
+                  )
+                ])
+              }),
+              0
+            )
           ])
         ])
       ])
     ])
-  }
-]
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
